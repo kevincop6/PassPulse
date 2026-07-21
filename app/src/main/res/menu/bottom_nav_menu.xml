@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/generatorFragment" android:icon="@drawable/ic_key" android:title="@string/generator" />
+    <item android:id="@+id/keysFragment" android:icon="@drawable/ic_lock" android:title="@string/my_keys" />
+    <item android:id="@+id/settingsFragment" android:icon="@drawable/ic_settings" android:title="@string/settings" />
+</menu>

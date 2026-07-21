@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph" app:startDestination="@id/generatorFragment">
+    <fragment android:id="@+id/generatorFragment" android:name="com.ulpro.passpulse.GeneratorFragment" android:label="@string/generator" />
+    <fragment android:id="@+id/keysFragment" android:name="com.ulpro.passpulse.KeysFragment" android:label="@string/my_keys" />
+    <fragment android:id="@+id/settingsFragment" android:name="com.ulpro.passpulse.SettingsFragment" android:label="@string/settings" />
+</navigation>

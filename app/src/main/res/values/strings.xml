@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">PassPulse</string><string name="generator">Generador</string><string name="my_keys">Mis Claves</string><string name="settings">Ajustes</string>
+    <string name="generate">Generar Nueva Contraseña</string><string name="copy">Copiar</string><string name="password_length">Longitud</string>
+    <string name="uppercase">Mayúsculas</string><string name="numbers">Números</string><string name="symbols">Símbolos</string>
+    <string name="history">Historial</string><string name="empty_history">Aún no hay contraseñas guardadas</string>
+    <string name="security_note">Tus claves permanecen cifradas y solo se descifran tras autenticarte.</string>
+</resources>
