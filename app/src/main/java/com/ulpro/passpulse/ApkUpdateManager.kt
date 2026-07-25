@@ -37,8 +37,8 @@ object ApkUpdateManager {
 
         val filename = result.assetName ?: "PassPulse-v$version.apk"
         val request = DownloadManager.Request(Uri.parse(url))
-            .setTitle("PassPulse $version")
-            .setDescription("Descargando actualización")
+            .setTitle(context.getString(R.string.app_name) + " $version")
+            .setDescription(context.getString(R.string.download_description))
             .setMimeType("application/vnd.android.package-archive")
             .setAllowedOverMetered(true)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -54,7 +54,7 @@ object ApkUpdateManager {
         if (preferences.getString(PREF_NOTIFIED_VERSION, null) == result.latestVersion) return
         preferences.edit().putString(PREF_NOTIFIED_VERSION, result.latestVersion).apply()
         val notificationManager = context.getSystemService(NotificationManager::class.java)
-        notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, "Actualizaciones", NotificationManager.IMPORTANCE_DEFAULT))
+        notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, context.getString(R.string.updates_channel_name), NotificationManager.IMPORTANCE_DEFAULT))
         val downloadIntent = Intent(context, UpdateNotificationReceiver::class.java).setAction(ACTION_DOWNLOAD_UPDATE)
         val pendingIntent = android.app.PendingIntent.getBroadcast(
             context, AVAILABLE_NOTIFICATION_ID, downloadIntent,
@@ -62,11 +62,11 @@ object ApkUpdateManager {
         )
         notificationManager.notify(AVAILABLE_NOTIFICATION_ID, NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_lock)
-            .setContentTitle("Nueva actualización de PassPulse")
-            .setContentText("La versión ${result.latestVersion} está disponible")
+            .setContentTitle(context.getString(R.string.new_update_notification_title))
+            .setContentText(context.getString(R.string.new_update_notification_text, result.latestVersion))
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .addAction(0, "Descargar", pendingIntent)
+            .addAction(0, context.getString(R.string.download_update_action), pendingIntent)
             .build())
     }
 
@@ -102,11 +102,11 @@ object ApkUpdateManager {
                 android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
             )
             val notificationManager = context.getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, "Actualizaciones", NotificationManager.IMPORTANCE_DEFAULT))
+            notificationManager.createNotificationChannel(NotificationChannel(CHANNEL_ID, context.getString(R.string.updates_channel_name), NotificationManager.IMPORTANCE_DEFAULT))
             notificationManager.notify(NOTIFICATION_ID, NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_lock)
-                .setContentTitle("Actualización de PassPulse lista")
-                .setContentText("Toca para instalar la actualización")
+                .setContentTitle(context.getString(R.string.update_ready_notification_title))
+                .setContentText(context.getString(R.string.update_ready_notification_text))
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .build())

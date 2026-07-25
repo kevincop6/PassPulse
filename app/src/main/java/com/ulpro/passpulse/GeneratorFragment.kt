@@ -41,7 +41,7 @@ class GeneratorFragment : Fragment() {
         loadSavedDefaults()
         lifecycleScope.launch { viewModel.password.collect { binding.passwordText.text = it } }
         binding.lengthSlider.addOnChangeListener { _, value, fromUser ->
-            binding.lengthValue.text = "${value.toInt()} caracteres"
+            binding.lengthValue.text = getString(R.string.length_characters, value.toInt())
             if (fromUser) { distributeCounts(); updateCountControls(); persistDefaults(); generatePreview() }
         }
         val optionListener = CompoundButton.OnCheckedChangeListener { button, checked ->
@@ -51,7 +51,7 @@ class GeneratorFragment : Fragment() {
                 binding.numbersSwitch.id -> if (checked) showOnly(binding.numbersCountPanel) else binding.numbersCountPanel.visibility = View.GONE
                 binding.symbolsSwitch.id -> if (checked) showOnly(binding.symbolsCountPanel) else binding.symbolsCountPanel.visibility = View.GONE
             }
-            distributeCounts(); updateCountControls(); persistDefaults(); generatePreview()
+            updateCountTitleVisibility(); distributeCounts(); updateCountControls(); persistDefaults(); generatePreview()
         }
         binding.lowercaseSwitch.setOnCheckedChangeListener(optionListener)
         binding.uppercaseSwitch.setOnCheckedChangeListener(optionListener)
@@ -66,9 +66,8 @@ class GeneratorFragment : Fragment() {
         }
         binding.generateButton.setOnClickListener { generatePreview() }
         binding.passwordText.setOnClickListener { copyAndSave(binding.passwordText.text.toString()) }
-        binding.copyButton.setOnClickListener { copyAndSave(binding.passwordText.text.toString()) }
         binding.copyContainer.setOnClickListener { copyAndSave(binding.passwordText.text.toString()) }
-        binding.lengthValue.text = "${binding.lengthSlider.value.toInt()} caracteres"
+        binding.lengthValue.text = getString(R.string.length_characters, binding.lengthSlider.value.toInt())
         listOf(binding.lowercaseCountPanel, binding.uppercaseCountPanel, binding.numbersCountPanel, binding.symbolsCountPanel).forEach { it.visibility = View.GONE }
         updateCountControls(); persistDefaults(); generatePreview(); refreshHistory(); refreshHandler.postDelayed(refreshRunnable, 30_000L)
     }
@@ -114,16 +113,20 @@ class GeneratorFragment : Fragment() {
         val counts = sliders.mapIndexed { index, slider -> if (active[index]) slider.value.toInt().coerceAtLeast(1) else 0 }.toMutableList()
         while (counts.sum() > length) { val index = counts.indices.reversed().firstOrNull { counts[it] > if (active[it]) 1 else 0 } ?: break; counts[index]-- }
         sliders.forEachIndexed { index, slider -> val otherMinimum = active.indices.count { it != index && active[it] }; slider.valueTo = (length - otherMinimum).coerceAtLeast(1).toFloat(); if (active[index]) slider.value = counts[index].coerceIn(1, slider.valueTo.toInt()).toFloat() }
-        binding.lowercaseCountValue.text = "Minúsculas: ${counts[0]} caracteres"; binding.uppercaseCountValue.text = "Mayúsculas: ${counts[1]} caracteres"; binding.numbersCountValue.text = "Números: ${counts[2]} caracteres"; binding.symbolsCountValue.text = "Símbolos: ${counts[3]} caracteres"
+        binding.lowercaseCountValue.text = getString(R.string.characters_count, getString(R.string.lowercase), counts[0])
+        binding.uppercaseCountValue.text = getString(R.string.characters_count, getString(R.string.uppercase), counts[1])
+        binding.numbersCountValue.text = getString(R.string.characters_count, getString(R.string.numbers), counts[2])
+        binding.symbolsCountValue.text = getString(R.string.characters_count, getString(R.string.symbols), counts[3])
         updatingCounts = false
     }
 
-    private fun togglePanel(panel: View) { if (panel.visibility == View.VISIBLE) panel.visibility = View.GONE else showOnly(panel) }
-    private fun showOnly(panel: View) { binding.lowercaseCountPanel.visibility = if (panel === binding.lowercaseCountPanel) View.VISIBLE else View.GONE; binding.uppercaseCountPanel.visibility = if (panel === binding.uppercaseCountPanel) View.VISIBLE else View.GONE; binding.numbersCountPanel.visibility = if (panel === binding.numbersCountPanel) View.VISIBLE else View.GONE; binding.symbolsCountPanel.visibility = if (panel === binding.symbolsCountPanel) View.VISIBLE else View.GONE }
+    private fun togglePanel(panel: View) { if (panel.visibility == View.VISIBLE) panel.visibility = View.GONE else showOnly(panel); updateCountTitleVisibility() }
+    private fun showOnly(panel: View) { binding.lowercaseCountPanel.visibility = if (panel === binding.lowercaseCountPanel) View.VISIBLE else View.GONE; binding.uppercaseCountPanel.visibility = if (panel === binding.uppercaseCountPanel) View.VISIBLE else View.GONE; binding.numbersCountPanel.visibility = if (panel === binding.numbersCountPanel) View.VISIBLE else View.GONE; binding.symbolsCountPanel.visibility = if (panel === binding.symbolsCountPanel) View.VISIBLE else View.GONE; updateCountTitleVisibility() }
+    private fun updateCountTitleVisibility() { val hasSelectedRequirement = listOf(binding.lowercaseCountPanel, binding.uppercaseCountPanel, binding.numbersCountPanel, binding.symbolsCountPanel).any { it.visibility == View.VISIBLE }; binding.countRequirementsCard.visibility = if (hasSelectedRequirement) View.VISIBLE else View.GONE; binding.countRequirementsTitle.visibility = if (hasSelectedRequirement) View.VISIBLE else View.GONE }
     private fun generatePreview() { viewModel.generate(binding.lengthSlider.value.toInt(), binding.lowercaseSwitch.isChecked, binding.uppercaseSwitch.isChecked, binding.numbersSwitch.isChecked, binding.symbolsSwitch.isChecked, binding.lowercaseCountSlider.value.toInt(), binding.uppercaseCountSlider.value.toInt(), binding.numbersCountSlider.value.toInt(), binding.symbolsCountSlider.value.toInt()) }
-    private fun copyAndSave(value: String) { SecurityRepository(requireContext()).save(value); val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("PassPulse", value)); refreshHistory(); Toast.makeText(requireContext(), "Contraseña copiada y guardada", Toast.LENGTH_SHORT).show() }
+    private fun copyAndSave(value: String) { SecurityRepository(requireContext()).save(value); val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), value)); refreshHistory(); Toast.makeText(requireContext(), R.string.password_copied_saved, Toast.LENGTH_SHORT).show() }
     private fun refreshHistory() { val items = SecurityRepository(requireContext()).read().take(5); binding.historyEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE; binding.historyList.layoutManager = LinearLayoutManager(requireContext()); binding.historyList.adapter = KeyAdapter(items) { authenticateAndCopy(it) } }
-    private fun authenticateAndCopy(item: StoredKey) { val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL; val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(requireContext()), object : BiometricPrompt.AuthenticationCallback() { override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) { val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText("PassPulse", item.value)); Toast.makeText(requireContext(), "Contraseña copiada", Toast.LENGTH_SHORT).show() } }); prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle("Desbloquear contraseña").setSubtitle("Autentícate para copiar esta clave").setAllowedAuthenticators(authenticators).build()) }
+    private fun authenticateAndCopy(item: StoredKey) { val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL; val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(requireContext()), object : BiometricPrompt.AuthenticationCallback() { override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) { val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), item.value)); Toast.makeText(requireContext(), R.string.password_copied, Toast.LENGTH_SHORT).show() } }); prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.unlock_password_title)).setSubtitle(getString(R.string.unlock_password_subtitle)).setAllowedAuthenticators(authenticators).build()) }
     override fun onResume() { super.onResume(); if (_binding != null) refreshHistory() }
     override fun onDestroyView() { refreshHandler.removeCallbacks(refreshRunnable); super.onDestroyView(); _binding = null }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
-    <SwitchPreferenceCompat app:key="biometric_required" app:title="Requerir autenticación al abrir" app:summary="Protege la sesión con el bloqueo del dispositivo" app:defaultValue="false" />
-    <SeekBarPreference app:key="default_length" app:title="Longitud predeterminada" app:summary="Entre 8 y 32 caracteres" app:defaultValue="16" />
-    <Preference app:key="clear_history" app:title="Borrar todo el historial ahora" app:summary="Esta acción no se puede deshacer" />
-    <Preference app:key="check_updates" app:title="Buscar actualizaciones" app:summary="Comprobar versión en GitHub" />
-    <Preference app:key="about" app:title="Acerca de PassPulse" app:summary="Versión de PassPulse" />
+    <SwitchPreferenceCompat app:key="biometric_required" app:title="@string/biometric_required_title" app:summary="@string/biometric_required_summary" app:defaultValue="false" />
+    <SeekBarPreference app:key="default_length" app:title="@string/default_length_title" app:summary="@string/default_length_summary" app:defaultValue="16" />
+    <Preference app:key="clear_history" app:title="@string/clear_history_title" app:summary="@string/clear_history_summary" />
+    <Preference app:key="check_updates" app:title="@string/check_updates_title" app:summary="@string/check_updates_summary" />
+    <Preference app:key="about" app:title="@string/about_title" app:summary="@string/about_summary" />
 </PreferenceScreen>

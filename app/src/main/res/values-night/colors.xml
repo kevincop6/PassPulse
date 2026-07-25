@@ -1,0 +1,8 @@
+<resources>
+    <color name="surface_soft">#101820</color>
+    <color name="card_surface">#1B2630</color>
+    <color name="divider">#3A4650</color>
+    <color name="text_primary">#F1F5F9</color>
+    <color name="text_secondary">#B8C3CC</color>
+    <color name="nav_tint">#B8C3CC</color>
+</resources>
