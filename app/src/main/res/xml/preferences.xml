@@ -1,1 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"><SwitchPreferenceCompat app:key="biometric_required" app:title="Requerir autenticación al abrir" app:summary="Protege la sesión con el bloqueo del dispositivo" app:defaultValue="false"/><SeekBarPreference app:key="default_length" app:title="Longitud predeterminada" app:summary="Entre 8 y 32 caracteres" app:defaultValue="16"/><Preference app:key="clear_history" app:title="Borrar todo el historial ahora" app:summary="Esta acción no se puede deshacer"/><Preference app:key="about" app:title="Acerca de PassPulse" app:summary="Versión 1.0 · Seguridad local y privacidad"/></PreferenceScreen>
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+    <SwitchPreferenceCompat app:key="biometric_required" app:title="Requerir autenticación al abrir" app:summary="Protege la sesión con el bloqueo del dispositivo" app:defaultValue="false" />
+    <SeekBarPreference app:key="default_length" app:title="Longitud predeterminada" app:summary="Entre 8 y 32 caracteres" app:defaultValue="16" />
+    <Preference app:key="clear_history" app:title="Borrar todo el historial ahora" app:summary="Esta acción no se puede deshacer" />
+    <Preference app:key="check_updates" app:title="Buscar actualizaciones" app:summary="Comprobar versión en GitHub" />
+    <Preference app:key="about" app:title="Acerca de PassPulse" app:summary="Versión de PassPulse" />
+</PreferenceScreen>

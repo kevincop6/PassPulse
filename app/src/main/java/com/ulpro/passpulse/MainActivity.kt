@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigation.setupWithNavController(navHost.navController)
         SecurityRepository(this).ensureDeviceKey()
         CleanupWorker.schedule(this)
+        UpdateCheckWorker.schedule(this)
         if (savedInstanceState == null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("biometric_required", false)) {
             requestAppAuthentication()
         }
