@@ -54,7 +54,25 @@ class SettingsFragment : PreferenceFragmentCompat() {
             val result = UpdateChecker.check(requireContext())
             updatePreference?.isEnabled = true
             updatePreference?.summary = result.toStatusText()
-            Toast.makeText(requireContext(), result.toUserMessage(), Toast.LENGTH_LONG).show()
+            if (result.isUpdateAvailable()) {
+                if (!ApkUpdateManager.installIfDownloaded(requireContext())) {
+                    if (result.assetUrl == null) {
+                        Toast.makeText(requireContext(), "La release no contiene un APK descargable", Toast.LENGTH_LONG).show()
+                    } else {
+                        AlertDialog.Builder(requireContext())
+                            .setTitle("Actualización disponible")
+                            .setMessage("Hay una nueva versión de PassPulse: ${result.latestVersion}. ¿Deseas descargarla ahora?")
+                            .setNegativeButton("Ahora no", null)
+                            .setPositiveButton("Descargar") { _, _ ->
+                                val started = ApkUpdateManager.startDownload(requireContext(), result)
+                                Toast.makeText(requireContext(), if (started) "Descarga iniciada en segundo plano" else "No se pudo iniciar la descarga", Toast.LENGTH_LONG).show()
+                            }
+                            .show()
+                    }
+                }
+            } else {
+                Toast.makeText(requireContext(), result.toUserMessage(), Toast.LENGTH_LONG).show()
+            }
         }
     }
 

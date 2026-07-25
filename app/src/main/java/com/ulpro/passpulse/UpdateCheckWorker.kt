@@ -12,7 +12,11 @@ import java.util.concurrent.TimeUnit
 
 class UpdateCheckWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
     override suspend fun doWork() = UpdateChecker.check(applicationContext).let { result ->
-        if (result.error == null) Result.success() else Result.retry()
+        if (result.error != null) Result.retry()
+        else {
+            if (result.isUpdateAvailable()) ApkUpdateManager.notifyUpdateAvailable(applicationContext, result)
+            Result.success()
+        }
     }
 
     companion object {
