@@ -1,5 +1,8 @@
 package com.ulpro.passpulse
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,8 +26,17 @@ class MainActivity : AppCompatActivity() {
         SecurityRepository(this).ensureDeviceKey()
         CleanupWorker.schedule(this)
         UpdateCheckWorker.schedule(this)
+        requestNotificationPermission()
         if (savedInstanceState == null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("biometric_required", false)) {
             requestAppAuthentication()
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 7307)
         }
     }
 
