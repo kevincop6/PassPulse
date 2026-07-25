@@ -52,7 +52,7 @@ tasks.register("renamePassPulseDebugApk") {
     doLast {
         val outputDir = layout.buildDirectory.dir("outputs/apk/debug").get().asFile
         val generatedApk = outputDir.resolve("app-debug.apk")
-        val version = android.defaultConfig.versionName.orEmpty().substringBefore('.').ifEmpty { "1" }
+        val version = android.defaultConfig.versionName.orEmpty().substringBefore('.').ifEmpty { "1.0" }
         val buildNumber = android.defaultConfig.versionCode ?: 1
         val namedApk = outputDir.resolve("PassPulse-v${version}(${buildNumber}).apk")
         if (generatedApk.exists()) {
