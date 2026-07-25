@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
+import androidx.preference.ListPreference
 import kotlinx.coroutines.launch
 
 class SettingsFragment : PreferenceFragmentCompat() {
@@ -16,6 +17,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         findPreference<SeekBarPreference>("default_length")?.apply { min = 8; max = 32 }
+        findPreference<ListPreference>("theme_mode")?.setOnPreferenceChangeListener { _, newValue ->
+            ThemeManager.apply(requireContext(), newValue.toString())
+            true
+        }
         findPreference<Preference>("clear_history")?.setOnPreferenceClickListener {
             AlertDialog.Builder(requireContext())
                 .setTitle(R.string.clear_history_dialog_title)
