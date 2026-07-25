@@ -1,7 +1,75 @@
 <resources>
-    <string name="app_name">PassPulse</string><string name="generator">Generador</string><string name="my_keys">Mis Claves</string><string name="settings">Ajustes</string>
-    <string name="generate">Generar Nueva Contraseña</string><string name="copy">Copiar</string><string name="password_length">Longitud</string>
-    <string name="uppercase">Mayúsculas</string><string name="numbers">Números</string><string name="symbols">Símbolos</string>
-    <string name="history">Historial</string><string name="empty_history">Aún no hay contraseñas guardadas</string>
+    <string name="app_name">PassPulse</string>
+    <string name="generator">Generador</string>
+    <string name="my_keys">Mis Claves</string>
+    <string name="settings">Ajustes</string>
+    <string name="generate">↻  Generar Nueva Contraseña</string>
+    <string name="copy_password">Copiar</string>
+    <string name="password_length">Longitud</string>
+    <string name="uppercase">Mayúsculas</string>
+    <string name="numbers">Números</string>
+    <string name="symbols">Símbolos</string>
+    <string name="lowercase">Minúsculas</string>
+    <string name="uppercase_symbol">A</string>
+    <string name="number_symbol">1</string>
+    <string name="symbols_symbol">#</string>
+    <string name="lowercase_symbol">a</string>
+    <string name="history">Historial</string>
+    <string name="empty_history">Aún no hay contraseñas guardadas</string>
     <string name="security_note">Tus claves permanecen cifradas y solo se descifran tras autenticarte.</string>
+    <string name="generator_title">Generador de
+Contraseñas Seguro</string>
+    <string name="characters_per_requirement">Cantidad de caracteres por requisito</string>
+    <string name="characters_count">%1$s: %2$d caracteres</string>
+    <string name="length_characters">%1$d caracteres</string>
+    <string name="saved_passwords">Contraseñas Guardadas</string>
+    <string name="latest_passwords">Últimas 30 contraseñas generadas</string>
+    <string name="auto_delete_note">Las claves se borran automáticamente después de 7 días.</string>
+    <string name="masked_password">••••••••••••••••</string>
+    <string name="date_placeholder">3 Jun, 22:00</string>
+    <string name="biometric_required_title">Requerir autenticación al abrir</string>
+    <string name="biometric_required_summary">Protege la sesión con el bloqueo del dispositivo</string>
+    <string name="default_length_title">Longitud predeterminada</string>
+    <string name="default_length_summary">Entre 8 y 32 caracteres</string>
+    <string name="clear_history_title">Borrar todo el historial ahora</string>
+    <string name="clear_history_summary">Esta acción no se puede deshacer</string>
+    <string name="check_updates_title">Buscar actualizaciones</string>
+    <string name="check_updates_summary">Comprobar versión en GitHub</string>
+    <string name="about_title">Acerca de PassPulse</string>
+    <string name="about_summary">Versión de PassPulse</string>
+    <string name="clear_history_dialog_title">Borrar historial</string>
+    <string name="clear_history_dialog_message">¿Eliminar todas las contraseñas guardadas?</string>
+    <string name="cancel">Cancelar</string>
+    <string name="delete">Borrar</string>
+    <string name="about_message">Versión %1$s
+Generación segura, cifrado local y privacidad por diseño.</string>
+    <string name="checking_updates">Comprobando…</string>
+    <string name="downloadable_release_missing">La release no contiene un APK descargable</string>
+    <string name="update_available_title">Actualización disponible</string>
+    <string name="update_available_message">Hay una nueva versión de PassPulse: %1$s. ¿Deseas descargarla ahora?</string>
+    <string name="not_now">Ahora no</string>
+    <string name="download">Descargar</string>
+    <string name="download_started">Descarga iniciada en segundo plano</string>
+    <string name="download_start_failed">No se pudo iniciar la descarga</string>
+    <string name="password_copied_saved">Contraseña copiada y guardada</string>
+    <string name="password_copied">Contraseña copiada</string>
+    <string name="unlock_password_title">Desbloquear contraseña</string>
+    <string name="unlock_password_subtitle">Autentícate para copiar esta clave</string>
+    <string name="unlock_passpulse_title">Desbloquear PassPulse</string>
+    <string name="unlock_passpulse_subtitle">Confirma tu identidad para abrir la aplicación</string>
+    <string name="configure_lock">Configura un método de bloqueo para proteger PassPulse</string>
+    <string name="update_check_failed">No se pudo comprobar la actualización</string>
+    <string name="latest_version">Estás usando la versión más reciente</string>
+    <string name="update_available_status">Actualización disponible: %1$s</string>
+    <string name="check_github_version">Comprobar versión en GitHub</string>
+    <string name="update_check_error_message">No se pudo comprobar la actualización. Inténtalo de nuevo más tarde.</string>
+    <string name="update_available_message_short">Hay una actualización disponible: %1$s</string>
+    <string name="app_updated_message">PassPulse está actualizado (%1$s)</string>
+    <string name="download_description">Descargando actualización</string>
+    <string name="new_update_notification_title">Nueva actualización de PassPulse</string>
+    <string name="new_update_notification_text">La versión %1$s está disponible</string>
+    <string name="download_update_action">Descargar</string>
+    <string name="update_ready_notification_title">Actualización de PassPulse lista</string>
+    <string name="update_ready_notification_text">Toca para instalar la actualización</string>
+    <string name="updates_channel_name">Actualizaciones</string>
 </resources>

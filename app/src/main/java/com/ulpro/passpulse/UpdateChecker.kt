@@ -17,15 +17,15 @@ data class UpdateResult(
     val error: String? = null
 ) {
     fun isUpdateAvailable() = latestVersion != null && UpdateChecker.compareVersions(latestVersion, UpdateChecker.currentVersionName()) > 0
-    fun toStatusText() = when {
-        error != null -> "No se pudo comprobar la actualización"
-        isUpdateAvailable() -> "Actualización disponible: $latestVersion"
-        else -> "Estás usando la versión más reciente"
+    fun toStatusText(context: Context) = when {
+        error != null -> context.getString(R.string.update_check_failed)
+        isUpdateAvailable() -> context.getString(R.string.update_available_status, latestVersion)
+        else -> context.getString(R.string.latest_version)
     }
-    fun toUserMessage() = when {
-        error != null -> "No se pudo comprobar la actualización. Inténtalo de nuevo más tarde."
-        isUpdateAvailable() -> "Hay una actualización disponible: $latestVersion"
-        else -> "PassPulse está actualizado (${UpdateChecker.currentVersionName()})"
+    fun toUserMessage(context: Context) = when {
+        error != null -> context.getString(R.string.update_check_error_message)
+        isUpdateAvailable() -> context.getString(R.string.update_available_message_short, latestVersion)
+        else -> context.getString(R.string.app_updated_message, UpdateChecker.currentVersionName())
     }
 }
 
@@ -74,9 +74,9 @@ object UpdateChecker {
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         val latest = preferences.getString(PREF_LATEST_VERSION, null)
         return when {
-            latest == null -> "Comprobar versión en GitHub"
-            preferences.getBoolean(PREF_UPDATE_AVAILABLE, false) -> "Actualización disponible: $latest"
-            else -> "Estás usando la versión más reciente"
+            latest == null -> context.getString(R.string.check_github_version)
+            preferences.getBoolean(PREF_UPDATE_AVAILABLE, false) -> context.getString(R.string.update_available_status, latest)
+            else -> context.getString(R.string.latest_version)
         }
     }
 

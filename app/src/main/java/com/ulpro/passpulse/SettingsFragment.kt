@@ -16,62 +16,56 @@ class SettingsFragment : PreferenceFragmentCompat() {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
         findPreference<SeekBarPreference>("default_length")?.apply { min = 8; max = 32 }
-
         findPreference<Preference>("clear_history")?.setOnPreferenceClickListener {
             AlertDialog.Builder(requireContext())
-                .setTitle("Borrar historial")
-                .setMessage("¿Eliminar todas las contraseñas guardadas?")
-                .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Borrar") { _, _ -> SecurityRepository(requireContext()).clear() }
+                .setTitle(R.string.clear_history_dialog_title)
+                .setMessage(R.string.clear_history_dialog_message)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete) { _, _ -> SecurityRepository(requireContext()).clear() }
                 .show()
             true
         }
-
         findPreference<Preference>("about")?.apply {
-            title = "Acerca de PassPulse"
-            summary = "Versión ${UpdateChecker.currentVersionName()} · Seguridad local y privacidad"
+            title = getString(R.string.about_title)
+            summary = getString(R.string.about_summary)
             setOnPreferenceClickListener {
                 AlertDialog.Builder(requireContext())
-                    .setTitle("PassPulse")
-                    .setMessage("Versión ${UpdateChecker.currentVersionName()}\nGeneración segura, cifrado local y privacidad por diseño.")
-                    .setPositiveButton("Aceptar", null)
+                    .setTitle(R.string.about_title)
+                    .setMessage(getString(R.string.about_message, UpdateChecker.currentVersionName()))
+                    .setPositiveButton(android.R.string.ok, null)
                     .show()
                 true
             }
         }
-
-        updatePreference?.setOnPreferenceClickListener {
-            checkForUpdates()
-            true
-        }
+        updatePreference?.setOnPreferenceClickListener { checkForUpdates(); true }
         updatePreference?.summary = UpdateChecker.savedStatus(requireContext())
     }
 
     private fun checkForUpdates() {
         updatePreference?.isEnabled = false
-        updatePreference?.summary = "Comprobando…"
+        updatePreference?.summary = getString(R.string.checking_updates)
         viewLifecycleOwner.lifecycleScope.launch {
             val result = UpdateChecker.check(requireContext())
             updatePreference?.isEnabled = true
-            updatePreference?.summary = result.toStatusText()
+            updatePreference?.summary = result.toStatusText(requireContext())
             if (result.isUpdateAvailable()) {
                 if (!ApkUpdateManager.installIfDownloaded(requireContext())) {
                     if (result.assetUrl == null) {
-                        Toast.makeText(requireContext(), "La release no contiene un APK descargable", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), R.string.downloadable_release_missing, Toast.LENGTH_LONG).show()
                     } else {
                         AlertDialog.Builder(requireContext())
-                            .setTitle("Actualización disponible")
-                            .setMessage("Hay una nueva versión de PassPulse: ${result.latestVersion}. ¿Deseas descargarla ahora?")
-                            .setNegativeButton("Ahora no", null)
-                            .setPositiveButton("Descargar") { _, _ ->
+                            .setTitle(R.string.update_available_title)
+                            .setMessage(getString(R.string.update_available_message, result.latestVersion))
+                            .setNegativeButton(R.string.not_now, null)
+                            .setPositiveButton(R.string.download) { _, _ ->
                                 val started = ApkUpdateManager.startDownload(requireContext(), result)
-                                Toast.makeText(requireContext(), if (started) "Descarga iniciada en segundo plano" else "No se pudo iniciar la descarga", Toast.LENGTH_LONG).show()
+                                Toast.makeText(requireContext(), if (started) R.string.download_started else R.string.download_start_failed, Toast.LENGTH_LONG).show()
                             }
                             .show()
                     }
                 }
             } else {
-                Toast.makeText(requireContext(), result.toUserMessage(), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), result.toUserMessage(requireContext()), Toast.LENGTH_LONG).show()
             }
         }
     }

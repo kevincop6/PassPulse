@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         val manager = BiometricManager.from(this)
         val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL
         if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
-            Toast.makeText(this, "Configura un método de bloqueo para proteger PassPulse", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, R.string.configure_lock, Toast.LENGTH_LONG).show()
             finish()
             return
         }
@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
         })
-        val info = BiometricPrompt.PromptInfo.Builder().setTitle("Desbloquear PassPulse").setSubtitle("Confirma tu identidad para abrir la aplicación").setAllowedAuthenticators(authenticators).build()
+        val info = BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.unlock_passpulse_title)).setSubtitle(getString(R.string.unlock_passpulse_subtitle)).setAllowedAuthenticators(authenticators).build()
         prompt.authenticate(info)
     }
 }
