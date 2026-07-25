@@ -2,6 +2,7 @@
 <PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
     <SwitchPreferenceCompat app:key="biometric_required" app:title="@string/biometric_required_title" app:summary="@string/biometric_required_summary" app:defaultValue="false" />
     <SeekBarPreference app:key="default_length" app:title="@string/default_length_title" app:summary="@string/default_length_summary" app:defaultValue="16" />
+    <ListPreference app:key="theme_mode" app:title="@string/theme_mode_title" app:summary="@string/theme_mode_summary" app:entries="@array/theme_mode_entries" app:entryValues="@array/theme_mode_values" app:defaultValue="system" />
     <Preference app:key="clear_history" app:title="@string/clear_history_title" app:summary="@string/clear_history_summary" />
     <Preference app:key="check_updates" app:title="@string/check_updates_title" app:summary="@string/check_updates_summary" />
     <Preference app:key="about" app:title="@string/about_title" app:summary="@string/about_summary" />

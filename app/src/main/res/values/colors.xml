@@ -4,6 +4,9 @@
     <color name="surface_soft">#F5F8FC</color>
     <color name="card_surface">#FFFFFF</color>
     <color name="divider">#DDE3EA</color>
+    <color name="nav_surface">#FFFFFF</color>
+    <color name="nav_item_selected">#145B9F</color>
+    <color name="nav_item_unselected">#46515B</color>
     <color name="nav_tint">#68727D</color>
     <color name="text_primary">#17202A</color>
     <color name="text_secondary">#65717D</color>
