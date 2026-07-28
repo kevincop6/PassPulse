@@ -27,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         (binding.bottomNavigation as NavigationBarView).setupWithNavController(navHost.navController)
         SecurityRepository(this).ensureDeviceKey()
         CleanupWorker.schedule(this)
+        VaultBackupScheduler.schedule(this)
         UpdateCheckWorker.schedule(this)
         requestNotificationPermission()
         if (savedInstanceState == null && PreferenceManager.getDefaultSharedPreferences(this).getBoolean("biometric_required", false)) {
