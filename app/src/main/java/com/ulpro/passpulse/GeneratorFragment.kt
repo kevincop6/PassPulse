@@ -12,16 +12,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import android.widget.Toast
+import android.text.method.HideReturnsTransformationMethod
+import android.text.method.PasswordTransformationMethod
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.ulpro.passpulse.databinding.FragmentGeneratorBinding
+import com.ulpro.passpulse.databinding.DialogVaultEntryBinding
 import kotlinx.coroutines.launch
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 class GeneratorFragment : Fragment() {
     private var _binding: FragmentGeneratorBinding? = null
@@ -124,9 +129,51 @@ class GeneratorFragment : Fragment() {
     private fun showOnly(panel: View) { binding.lowercaseCountPanel.visibility = if (panel === binding.lowercaseCountPanel) View.VISIBLE else View.GONE; binding.uppercaseCountPanel.visibility = if (panel === binding.uppercaseCountPanel) View.VISIBLE else View.GONE; binding.numbersCountPanel.visibility = if (panel === binding.numbersCountPanel) View.VISIBLE else View.GONE; binding.symbolsCountPanel.visibility = if (panel === binding.symbolsCountPanel) View.VISIBLE else View.GONE; updateCountTitleVisibility() }
     private fun updateCountTitleVisibility() { val hasSelectedRequirement = listOf(binding.lowercaseCountPanel, binding.uppercaseCountPanel, binding.numbersCountPanel, binding.symbolsCountPanel).any { it.visibility == View.VISIBLE }; binding.countRequirementsCard.visibility = if (hasSelectedRequirement) View.VISIBLE else View.GONE; binding.countRequirementsTitle.visibility = if (hasSelectedRequirement) View.VISIBLE else View.GONE }
     private fun generatePreview() { viewModel.generate(binding.lengthSlider.value.toInt(), binding.lowercaseSwitch.isChecked, binding.uppercaseSwitch.isChecked, binding.numbersSwitch.isChecked, binding.symbolsSwitch.isChecked, binding.lowercaseCountSlider.value.toInt(), binding.uppercaseCountSlider.value.toInt(), binding.numbersCountSlider.value.toInt(), binding.symbolsCountSlider.value.toInt()) }
-    private fun copyAndSave(value: String) { SecurityRepository(requireContext()).save(value); val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), value)); refreshHistory(); Toast.makeText(requireContext(), R.string.password_copied_saved, Toast.LENGTH_SHORT).show() }
-    private fun refreshHistory() { val items = SecurityRepository(requireContext()).read().take(5); binding.historyEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE; binding.historyList.layoutManager = LinearLayoutManager(requireContext()); binding.historyList.adapter = KeyAdapter(items) { authenticateAndCopy(it) } }
-    private fun authenticateAndCopy(item: StoredKey) { val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL; val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(requireContext()), object : BiometricPrompt.AuthenticationCallback() { override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) { val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), item.value)); Toast.makeText(requireContext(), R.string.password_copied, Toast.LENGTH_SHORT).show() } }); prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.unlock_password_title)).setSubtitle(getString(R.string.unlock_password_subtitle)).setAllowedAuthenticators(authenticators).build()) }
+    private fun copyAndSave(value: String) {
+        MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.save_generated_title).setMessage(R.string.save_generated_message)
+            .setNegativeButton(R.string.do_not_save) { _, _ -> copyOnly(value) }
+            .setPositiveButton(R.string.save_password) { _, _ -> showSaveDialog(value) }.show()
+    }
+    private fun copyOnly(value: String) { val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager; clipboard.setPrimaryClip(ClipData.newPlainText(getString(R.string.app_name), value)); Toast.makeText(requireContext(), R.string.password_copied, Toast.LENGTH_SHORT).show() }
+    private fun showSaveDialog(value: String) {
+        val dialogBinding = DialogVaultEntryBinding.inflate(layoutInflater)
+        dialogBinding.entryTypeIcon.setImageResource(R.drawable.ic_app)
+        dialogBinding.entryTypeLabel.setText(R.string.application_entry)
+        dialogBinding.nameEdit.setText("")
+        dialogBinding.websiteEdit.setText("")
+        dialogBinding.usernameEdit.setText("")
+        dialogBinding.passwordEdit.setText(value)
+        dialogBinding.passwordEdit.transformationMethod = PasswordTransformationMethod.getInstance()
+        dialogBinding.notesEdit.setText("")
+        val dialog = MaterialAlertDialogBuilder(requireContext()).setTitle(R.string.save_password).setView(dialogBinding.root).setNegativeButton(R.string.cancel) { _, _ -> copyOnly(value) }.create()
+        dialogBinding.passwordLayout.setEndIconOnClickListener {
+            val visible = dialogBinding.passwordEdit.transformationMethod == null
+            dialogBinding.passwordEdit.transformationMethod = if (visible) PasswordTransformationMethod.getInstance() else HideReturnsTransformationMethod.getInstance()
+            dialogBinding.passwordLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), if (visible) R.drawable.ic_visibility else R.drawable.ic_visibility_off)
+            dialogBinding.passwordEdit.setSelection(dialogBinding.passwordEdit.text?.length ?: 0)
+        }
+        dialogBinding.copyPassword.setOnClickListener { authenticateAndCopyValue(dialogBinding.passwordEdit.text?.toString().orEmpty()) }
+        dialogBinding.websiteEdit.doAfterTextChanged { text ->
+            val isWebsite = !text.isNullOrBlank()
+            dialogBinding.entryTypeLabel.setText(if (isWebsite) R.string.website_entry else R.string.application_entry)
+            dialogBinding.entryTypeIcon.setImageResource(if (isWebsite) R.drawable.ic_web else R.drawable.ic_app)
+        }
+        dialogBinding.saveEntry.setOnClickListener {
+            val title = dialogBinding.nameEdit.text?.toString()?.trim().orEmpty()
+            val username = dialogBinding.usernameEdit.text?.toString()?.trim().orEmpty()
+            dialogBinding.nameLayout.error = if (title.isBlank()) getString(R.string.required_field) else null
+            dialogBinding.usernameLayout.error = if (username.isBlank()) getString(R.string.required_field) else null
+            if (title.isBlank() || username.isBlank()) return@setOnClickListener
+            val address = dialogBinding.websiteEdit.text?.toString()?.trim().orEmpty()
+            SecurityRepository(requireContext()).upsert(VaultEntry(name = title, username = username, password = dialogBinding.passwordEdit.text?.toString().orEmpty(), notes = dialogBinding.notesEdit.text?.toString().orEmpty(), uris = if (address.isBlank()) emptyList() else listOf(address), kind = if (address.isBlank()) "app" else "website"))
+            val savedPassword = dialogBinding.passwordEdit.text?.toString().orEmpty().ifBlank { value }
+            copyOnly(savedPassword); dialog.dismiss(); refreshHistory()
+        }
+        dialog.show()
+    }
+    private fun refreshHistory() { val items = SecurityRepository(requireContext()).read().take(15); binding.historyEmpty.visibility = if (items.isEmpty()) View.VISIBLE else View.GONE; binding.historyList.layoutManager = LinearLayoutManager(requireContext()); binding.historyList.adapter = KeyAdapter(items) { authenticateAndCopy(it) } }
+    private fun authenticateAndCopy(item: VaultEntry) { authenticateAndCopyValue(item.password) }
+    private fun authenticateAndCopyValue(value: String) { val authenticators = BiometricManager.Authenticators.BIOMETRIC_STRONG or BiometricManager.Authenticators.DEVICE_CREDENTIAL; val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(requireContext()), object : BiometricPrompt.AuthenticationCallback() { override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) { copyOnly(value) } }); prompt.authenticate(BiometricPrompt.PromptInfo.Builder().setTitle(getString(R.string.unlock_password_title)).setSubtitle(getString(R.string.unlock_password_subtitle)).setAllowedAuthenticators(authenticators).build()) }
     override fun onResume() { super.onResume(); if (_binding != null) refreshHistory() }
     override fun onDestroyView() { refreshHandler.removeCallbacks(refreshRunnable); super.onDestroyView(); _binding = null }
 }

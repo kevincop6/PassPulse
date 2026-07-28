@@ -84,4 +84,37 @@ Generación segura, cifrado local y privacidad por diseño.</string>
         <item>light</item>
         <item>dark</item>
     </string-array>
+    <string name="vault_subtitle">Tus accesos permanecen en el dispositivo y no caducan.</string>
+    <string name="vault_security_note">La bóveda usa AES-256-GCM con una clave protegida por Android Keystore. Las contraseñas solo se muestran tras huella o bloqueo del dispositivo.</string>
+    <string name="search_keys">Buscar en mis claves</string>
+    <string name="password_entry">Entrada de contraseña</string>
+    <string name="close">Cerrar</string>
+    <string name="save_generated_title">¿Deseas guardar esta contraseña?</string>
+    <string name="save_generated_message">Puedes guardarla como una entrada de la bóveda o copiarla solo al portapapeles.</string>
+    <string name="do_not_save">No guardar</string>
+    <string name="save_password">Guardar en Mis Claves</string>
+    <string name="entry_name_hint">Nombre o sitio</string>
+    <string name="generated_entry_name">Contraseña generada</string>
+    <string name="website_hint">Aplicación o dirección web</string>
+    <string name="saved_passwords_15">Últimas 15 contraseñas guardadas</string>
+    <string name="application_entry">Aplicación</string>
+    <string name="website_entry">Sitio web</string>
+    <string name="username_hint">Usuario o correo</string>
+    <string name="notes_hint">Notas (opcional)</string>
+    <string name="password_field_hint">Contraseña</string>
+    <string name="show_password">Visualizar</string>
+    <string name="hide_password">Ocultar</string>
+    <string name="save_changes">Guardar cambios</string>
+    <string name="entry_updated">Entrada actualizada</string>
+    <string name="protected_entry">Información protegida en tu dispositivo</string>
+    <string name="vault_entry_details">Datos de acceso</string>
+    <string name="required_field">Este campo es obligatorio</string>
+    <string name="autofill_entry_name">Acceso guardado desde una aplicación</string>
+    <string name="backup_title">Backup cifrado en Drive</string>
+    <string name="backup_summary">Elige una carpeta de Google Drive o Archivos para sincronizar automáticamente la bóveda.</string>
+    <string name="backup_enabled">Backup automático configurado</string>
+    <string name="restore_backup_title">Restaurar backup cifrado</string>
+    <string name="restore_backup_summary">Transfiere tus claves desde otro dispositivo.</string>
+    <string name="backup_restored">Backup restaurado correctamente</string>
+    <string name="backup_restore_failed">No se pudo restaurar el backup</string>
 </resources>

@@ -9,6 +9,7 @@ import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.SeekBarPreference
 import androidx.preference.ListPreference
 import kotlinx.coroutines.launch
+import android.content.Intent
 
 class SettingsFragment : PreferenceFragmentCompat() {
     private val updatePreference: Preference?
@@ -16,6 +17,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.preferences, rootKey)
+        findPreference<Preference>("backup_location")?.setOnPreferenceClickListener {
+            startActivityForResult(Intent(Intent.ACTION_CREATE_DOCUMENT).setType("application/octet-stream").putExtra(Intent.EXTRA_TITLE, "passpulse-vault.backup").addCategory(Intent.CATEGORY_OPENABLE).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION), 9401)
+            true
+        }
+        findPreference<Preference>("restore_backup")?.setOnPreferenceClickListener {
+            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT).setType("application/octet-stream").addCategory(Intent.CATEGORY_OPENABLE), 9402)
+            true
+        }
         findPreference<SeekBarPreference>("default_length")?.apply { min = 8; max = 32 }
         findPreference<ListPreference>("theme_mode")?.setOnPreferenceChangeListener { _, newValue ->
             ThemeManager.apply(requireContext(), newValue.toString())
@@ -44,6 +53,21 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
         updatePreference?.setOnPreferenceClickListener { checkForUpdates(); true }
         updatePreference?.summary = UpdateChecker.savedStatus(requireContext())
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: android.content.Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 9401 && resultCode == android.app.Activity.RESULT_OK) data?.data?.let { uri ->
+            requireContext().contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            requireContext().getSharedPreferences("vault_backup", 0).edit().putString("uri", uri.toString()).apply()
+            VaultBackupScheduler.schedule(requireContext())
+            findPreference<Preference>("backup_location")?.summary = getString(R.string.backup_enabled)
+        }
+        if (requestCode == 9402 && resultCode == android.app.Activity.RESULT_OK) data?.data?.let { uri ->
+            runCatching { requireContext().contentResolver.openInputStream(uri)?.use { SecurityRepository(requireContext()).importEncrypted(it.readBytes()) } ?: error("empty") }
+                .onSuccess { Toast.makeText(requireContext(), R.string.backup_restored, Toast.LENGTH_LONG).show() }
+                .onFailure { Toast.makeText(requireContext(), R.string.backup_restore_failed, Toast.LENGTH_LONG).show() }
+        }
     }
 
     private fun checkForUpdates() {

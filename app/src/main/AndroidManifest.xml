@@ -10,6 +10,10 @@
             <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
         </activity>
         <activity android:name=".ApkInstallActivity" android:exported="false" />
+        <service android:name=".PassPulseAutofillService" android:label="@string/app_name" android:permission="android.permission.BIND_AUTOFILL_SERVICE" android:exported="true">
+            <intent-filter><action android:name="android.service.autofill.AutofillService" /></intent-filter>
+            <meta-data android:name="android.autofill" android:resource="@xml/autofill_service" />
+        </service>
         <receiver android:name=".ApkDownloadReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />

@@ -7,6 +7,7 @@ import androidx.work.WorkerParameters
 import androidx.work.WorkManager
 import java.util.concurrent.TimeUnit
 class CleanupWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-    override suspend fun doWork() = runCatching { SecurityRepository(applicationContext).removeExpired() }.fold({ Result.success() }, { Result.retry() })
+    // Vault entries are intentionally persistent. This worker remains as a no-op for upgrades from older builds.
+    override suspend fun doWork() = Result.success()
     companion object { fun schedule(context: Context) { WorkManager.getInstance(context).enqueueUniquePeriodicWork("passpulse_cleanup", ExistingPeriodicWorkPolicy.KEEP, PeriodicWorkRequestBuilder<CleanupWorker>(1, TimeUnit.DAYS).build()) } }
 }
