@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         val navHost = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         (binding.bottomNavigation as NavigationBarView).setupWithNavController(navHost.navController)
         SecurityRepository(this).ensureDeviceKey()
+        ApkUpdateManager.cleanupAfterInstall(this)
         CleanupWorker.schedule(this)
         VaultBackupScheduler.schedule(this)
         UpdateCheckWorker.schedule(this)

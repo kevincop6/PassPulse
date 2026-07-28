@@ -78,7 +78,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
             updatePreference?.isEnabled = true
             updatePreference?.summary = result.toStatusText(requireContext())
             if (result.isUpdateAvailable()) {
-                if (!ApkUpdateManager.installIfDownloaded(requireContext())) {
+                if (!ApkUpdateManager.installIfDownloaded(requireContext(), result.latestVersion.orEmpty())) {
                     if (result.assetUrl == null) {
                         Toast.makeText(requireContext(), R.string.downloadable_release_missing, Toast.LENGTH_LONG).show()
                     } else {

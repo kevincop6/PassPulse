@@ -8,6 +8,7 @@
                     <TextView android:id="@+id/entryTypeLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/application_entry" android:textColor="@color/primary_dark" android:textSize="12sp" android:textStyle="bold" />
                     <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="@string/protected_entry" android:textColor="@color/text_secondary" android:textSize="13sp" />
                 </LinearLayout>
+                <com.google.android.material.materialswitch.MaterialSwitch android:id="@+id/entryTypeSwitch" android:layout_width="wrap_content" android:layout_height="wrap_content" android:contentDescription="@string/application_toggle" android:text="@string/application_toggle" android:textColor="@color/text_secondary" android:textSize="11sp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="8dp" android:text="@string/vault_entry_details" android:textColor="@color/text_primary" android:textSize="15sp" android:textStyle="bold" />
@@ -31,5 +32,6 @@
             <com.google.android.material.textfield.TextInputEditText android:id="@+id/notesEdit" android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="top" android:inputType="textMultiLine|textCapSentences" android:minLines="2" android:textColor="@color/text_primary" />
         </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.button.MaterialButton android:id="@+id/saveEntry" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="18dp" android:text="@string/save_changes" android:textSize="15sp" app:backgroundTint="@color/primary_blue" app:cornerRadius="16dp" app:icon="@drawable/ic_save" app:iconGravity="textStart" app:iconPadding="8dp" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/deleteEntry" android:layout_width="match_parent" android:layout_height="52dp" android:layout_marginTop="8dp" android:text="@string/delete_entry" android:textColor="@color/danger" app:backgroundTint="@android:color/transparent" app:cornerRadius="16dp" app:icon="@drawable/ic_delete" app:iconGravity="textStart" app:iconPadding="8dp" app:strokeColor="@color/danger" app:strokeWidth="1dp" />
     </LinearLayout>
 </ScrollView>

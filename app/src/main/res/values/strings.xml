@@ -109,6 +109,10 @@ Generación segura, cifrado local y privacidad por diseño.</string>
     <string name="protected_entry">Información protegida en tu dispositivo</string>
     <string name="vault_entry_details">Datos de acceso</string>
     <string name="required_field">Este campo es obligatorio</string>
+    <string name="application_toggle">Es una aplicación</string>
+    <string name="delete_entry">Eliminar entrada</string>
+    <string name="delete_entry_title">¿Eliminar esta entrada?</string>
+    <string name="delete_entry_message">Esta acción eliminará la contraseña guardada de este dispositivo.</string>
     <string name="autofill_entry_name">Acceso guardado desde una aplicación</string>
     <string name="backup_title">Backup cifrado en Drive</string>
     <string name="backup_summary">Elige una carpeta de Google Drive o Archivos para sincronizar automáticamente la bóveda.</string>

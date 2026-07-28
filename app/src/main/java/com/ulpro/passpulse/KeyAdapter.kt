@@ -13,7 +13,7 @@ class KeyAdapter(private val items: List<VaultEntry>, private val onClick: (Vaul
     override fun getItemCount() = items.size
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val item = items[position]
-        val isWebsite = item.kind == "website" || item.uris.isNotEmpty()
+        val isWebsite = item.kind == "website" || (item.kind == "login" && item.uris.isNotEmpty())
         holder.binding.entryTypeIcon.setImageResource(if (isWebsite) R.drawable.ic_web else R.drawable.ic_app)
         holder.binding.entryTypeIcon.contentDescription = holder.itemView.context.getString(if (isWebsite) R.string.website_entry else R.string.application_entry)
         holder.binding.titleText.text = item.name

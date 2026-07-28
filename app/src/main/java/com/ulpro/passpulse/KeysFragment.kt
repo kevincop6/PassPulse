@@ -17,7 +17,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.ulpro.passpulse.databinding.DialogVaultEntryBinding
 import com.ulpro.passpulse.databinding.FragmentKeysBinding
 
 class KeysFragment : Fragment() {
@@ -48,42 +47,61 @@ class KeysFragment : Fragment() {
     }
 
     private fun showUnlocked(item: VaultEntry) {
-        val dialogBinding = DialogVaultEntryBinding.inflate(layoutInflater)
-        val isWebsite = item.kind == "website" || item.uris.isNotEmpty()
-        dialogBinding.entryTypeIcon.setImageResource(if (isWebsite) R.drawable.ic_web else R.drawable.ic_app)
-        dialogBinding.entryTypeLabel.setText(if (isWebsite) R.string.website_entry else R.string.application_entry)
-        dialogBinding.nameEdit.setText(item.name)
-        dialogBinding.websiteEdit.setText(item.uris.firstOrNull().orEmpty())
-        dialogBinding.usernameEdit.setText(item.username)
-        dialogBinding.passwordEdit.setText(item.password)
-        dialogBinding.passwordEdit.transformationMethod = PasswordTransformationMethod.getInstance()
-        dialogBinding.notesEdit.setText(item.notes)
-        val dialog = MaterialAlertDialogBuilder(requireContext()).setTitle(item.name).setView(dialogBinding.root).setNegativeButton(R.string.close, null).create()
-        dialogBinding.passwordLayout.setEndIconOnClickListener {
-            val visible = dialogBinding.passwordEdit.transformationMethod == null
-            dialogBinding.passwordEdit.transformationMethod = if (visible) PasswordTransformationMethod.getInstance() else HideReturnsTransformationMethod.getInstance()
-            dialogBinding.passwordLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), if (visible) R.drawable.ic_visibility else R.drawable.ic_visibility_off)
-            dialogBinding.passwordEdit.setSelection(dialogBinding.passwordEdit.text?.length ?: 0)
+        val dialogViews = VaultEntryDialogViews(layoutInflater.inflate(R.layout.dialog_vault_entry, null))
+        val isWebsite = item.kind == "website" || (item.kind == "login" && item.uris.isNotEmpty())
+        dialogViews.entryTypeIcon.setImageResource(if (isWebsite) R.drawable.ic_web else R.drawable.ic_app)
+        dialogViews.entryTypeLabel.setText(if (isWebsite) R.string.website_entry else R.string.application_entry)
+        dialogViews.entryTypeSwitch.isChecked = !isWebsite
+        dialogViews.deleteEntry.visibility = View.VISIBLE
+        dialogViews.nameEdit.setText(item.name)
+        dialogViews.websiteEdit.setText(item.uris.firstOrNull().orEmpty())
+        dialogViews.usernameEdit.setText(item.username)
+        dialogViews.passwordEdit.setText(item.password)
+        dialogViews.passwordEdit.transformationMethod = PasswordTransformationMethod.getInstance()
+        dialogViews.notesEdit.setText(item.notes)
+        val dialog = MaterialAlertDialogBuilder(requireContext()).setTitle(item.name).setView(dialogViews.root).setNegativeButton(R.string.close, null).create()
+        dialogViews.passwordLayout.setEndIconOnClickListener {
+            val visible = dialogViews.passwordEdit.transformationMethod == null
+            dialogViews.passwordEdit.transformationMethod = if (visible) PasswordTransformationMethod.getInstance() else HideReturnsTransformationMethod.getInstance()
+            dialogViews.passwordLayout.endIconDrawable = ContextCompat.getDrawable(requireContext(), if (visible) R.drawable.ic_visibility else R.drawable.ic_visibility_off)
+            dialogViews.passwordEdit.setSelection(dialogViews.passwordEdit.text?.length ?: 0)
         }
-        dialogBinding.copyPassword.setOnClickListener { authenticateForCopy(dialogBinding.passwordEdit.text?.toString().orEmpty()) }
-        dialogBinding.saveEntry.setOnClickListener {
-            val title = dialogBinding.nameEdit.text?.toString()?.trim().orEmpty()
-            val username = dialogBinding.usernameEdit.text?.toString()?.trim().orEmpty()
-            dialogBinding.nameLayout.error = if (title.isBlank()) getString(R.string.required_field) else null
-            dialogBinding.usernameLayout.error = if (username.isBlank()) getString(R.string.required_field) else null
-            if (title.isBlank() || username.isBlank()) return@setOnClickListener
-            val uri = dialogBinding.websiteEdit.text?.toString()?.trim().orEmpty()
-            SecurityRepository(requireContext()).upsert(item.copy(
-                name = title,
-                username = username,
-                password = dialogBinding.passwordEdit.text?.toString().orEmpty(),
-                notes = dialogBinding.notesEdit.text?.toString().orEmpty(),
-                uris = if (uri.isBlank()) emptyList() else listOf(uri),
-                kind = if (uri.isBlank()) "app" else "website"
-            ))
-            Toast.makeText(requireContext(), R.string.entry_updated, Toast.LENGTH_SHORT).show()
-            dialog.dismiss()
-            refresh()
+        dialogViews.entryTypeSwitch.setOnCheckedChangeListener { _, checked ->
+            dialogViews.entryTypeIcon.setImageResource(if (checked) R.drawable.ic_app else R.drawable.ic_web)
+            dialogViews.entryTypeLabel.setText(if (checked) R.string.application_entry else R.string.website_entry)
+        }
+        dialogViews.copyPassword.setOnClickListener { authenticateForCopy(dialogViews.passwordEdit.text?.toString().orEmpty()) }
+        dialogViews.saveEntry.setOnClickListener {
+            val title = dialogViews.nameEdit.text?.toString()?.trim().orEmpty()
+            val username = dialogViews.usernameEdit.text?.toString()?.trim().orEmpty()
+            dialogViews.nameLayout.error = if (title.isBlank()) getString(R.string.required_field) else null
+            dialogViews.usernameLayout.error = if (username.isBlank()) getString(R.string.required_field) else null
+            if (title.isNotBlank() && username.isNotBlank()) {
+                val uri = dialogViews.websiteEdit.text?.toString()?.trim().orEmpty()
+                SecurityRepository(requireContext()).upsert(item.copy(
+                    name = title,
+                    username = username,
+                    password = dialogViews.passwordEdit.text?.toString().orEmpty(),
+                    notes = dialogViews.notesEdit.text?.toString().orEmpty(),
+                    uris = if (uri.isBlank()) emptyList() else listOf(uri),
+                    kind = if (dialogViews.entryTypeSwitch.isChecked) "app" else "website"
+                ))
+                Toast.makeText(requireContext(), R.string.entry_updated, Toast.LENGTH_SHORT).show()
+                dialog.dismiss()
+                refresh()
+            }
+        }
+        dialogViews.deleteEntry.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(R.string.delete_entry_title)
+                .setMessage(R.string.delete_entry_message)
+                .setNegativeButton(R.string.cancel, null)
+                .setPositiveButton(R.string.delete) { _, _ ->
+                    SecurityRepository(requireContext()).remove(item.id)
+                    dialog.dismiss()
+                    refresh()
+                }
+                .show()
         }
         dialog.show()
     }
